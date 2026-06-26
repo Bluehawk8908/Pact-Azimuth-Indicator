@@ -41,6 +41,7 @@ namespace PactAzimuthIndicatorMod
                 if (mils > 3000) mils -= 3000; else mils += 3000;                
                 string milsString = mils.ToString();                
                 if (mils > 100 && mils < 1000) milsString = milsString.Insert(0, "0");
+                if (mils == 100) milsString += "0"; 
                 if (mils < 100) milsString = milsString.Insert(0, "00");
                 milsString = milsString.Insert(2, "-");
                 _weaponText.text = temp + "\n" + milsString + " mils";                
