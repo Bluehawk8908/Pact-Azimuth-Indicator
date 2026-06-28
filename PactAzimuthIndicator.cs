@@ -87,7 +87,9 @@ namespace PactAzimuthIndicatorMod
         public IEnumerator TurretClock(GameState _)
         {
             Vehicle playerVic = GameObject.FindObjectOfType<PlayerInput>().CurrentPlayerDamageStatus as Vehicle;
-            string playerVicShort = playerVic.UniqueName.Substring(0,3);
+            string playerVicShort;            
+            if (playerVic.UniqueName.Length < 3) playerVicShort = playerVic.UniqueName + "    "; 
+            else playerVicShort = playerVic.UniqueName.Substring(0, 3);
             bool warsawPact;
             switch (playerVicShort)
             {
