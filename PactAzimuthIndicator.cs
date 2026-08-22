@@ -14,7 +14,7 @@ using MelonLoader;
 using PactAzimuthIndicatorMod;
 using HarmonyLib;
 
-[assembly: MelonInfo(typeof(PactAzimuthIndicator), "Pact Azimuth Indicator", "1.2.0", "Bluehawk")]
+[assembly: MelonInfo(typeof(PactAzimuthIndicator), "Pact Azimuth Indicator", "1.2.1", "Bluehawk")]
 [assembly: MelonGame("Radian Simulations LLC", "GHPC")]
 
 namespace PactAzimuthIndicatorMod
