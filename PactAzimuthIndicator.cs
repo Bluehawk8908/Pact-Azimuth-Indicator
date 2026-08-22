@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using GHPC;
+using GHPC.Camera;
 using GHPC.Player;
 using GHPC.State;
 using GHPC.UI.Hud;
@@ -202,6 +203,16 @@ namespace PactAzimuthIndicatorMod
                     azimuthText.playerInput = Object.FindObjectOfType<PlayerInput>();
                     azimuthText.ownRect = rectT;
                     azimuthText.anchor = gameManager.transform.Find("UIHUDCanvas/weapons text/azimuth HUD").GetComponent<RectTransform>();
+
+                    FreeCamExclusionList excList = gameManager.GetComponent<FreeCamExclusionList>();
+                    int oldLength = excList.ExcludedItems.Length;                    
+                    GameObject[] tempArray = new GameObject[oldLength + 1];                    
+                    for (int i = 0; i < oldLength; i++)
+                    {
+                        tempArray[i] = excList.ExcludedItems[i];                        
+                    }
+                    tempArray[oldLength] = milsText_go;                    
+                    excList.ExcludedItems = tempArray;
                 }
             }
             
