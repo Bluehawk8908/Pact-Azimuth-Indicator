@@ -1,7 +1,6 @@
 using System.IO;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 using GHPC;
@@ -14,7 +13,7 @@ using MelonLoader;
 using PactAzimuthIndicatorMod;
 using HarmonyLib;
 
-[assembly: MelonInfo(typeof(PactAzimuthIndicator), "Pact Azimuth Indicator", "1.1.0", "Bluehawk")]
+[assembly: MelonInfo(typeof(PactAzimuthIndicator), "Pact Azimuth Indicator", "1.2.0", "Bluehawk")]
 [assembly: MelonGame("Radian Simulations LLC", "GHPC")]
 
 namespace PactAzimuthIndicatorMod
@@ -22,20 +21,16 @@ namespace PactAzimuthIndicatorMod
 
     public class AzimuthText : MonoBehaviour
     {
-        public Text _weaponText;
-        public WeaponHud _weaponHUD;
+        public Text _textBox;        
         public PlayerInput playerInput;
         public NwhChassis _chassis;
         public AimablePlatform _aimablePlatform;
+        public RectTransform ownRect;
+        public RectTransform anchor;
         public void Update()
         {
-            if (_weaponText != null && _aimablePlatform != null)
-            {
-                string temp;
-                var _sbRef = AccessTools.FieldRefAccess<WeaponHud, StringBuilder>("_sb");
-                StringBuilder weapSB = _sbRef(_weaponHUD);
-                temp = weapSB.ToString();
-                
+            if (_textBox != null && _aimablePlatform != null)
+            { 
                 float turretHeading = _aimablePlatform.LocalRotation.eulerAngles.y;
                 int mils = (int)(turretHeading * 16.667f);
                 if (mils > 3000) mils -= 3000; else mils += 3000;                
@@ -44,7 +39,7 @@ namespace PactAzimuthIndicatorMod
                 else if (mils < 100) milsString = milsString.Insert(0, "00");
                 else if (mils < 1000) milsString = milsString.Insert(0, "0");
                 milsString = milsString.Insert(2, "-");
-                _weaponText.text = temp + "\n" + milsString + " mils";                
+                _textBox.text = milsString + " mils";                
             }
         }
 
@@ -53,7 +48,8 @@ namespace PactAzimuthIndicatorMod
             if (playerInput.CurrentPlayerChassis != null) _chassis = playerInput.CurrentPlayerChassis as NwhChassis;
             WeaponsManager wepMan = (playerInput.CurrentPlayerUnit != null) ? playerInput.CurrentPlayerUnit.WeaponsManager : null;
             if (wepMan != null) _aimablePlatform = wepMan.Weapons[0].FCS.Mounts[0];
-        }
+            ownRect.position = new Vector3(anchor.position.x + anchor.rect.width, ownRect.position.y, ownRect.position.z);
+        }       
 
     }
 
@@ -165,7 +161,7 @@ namespace PactAzimuthIndicatorMod
                         GameObject target = new GameObject("target");
                         target.transform.parent = azimuthHUD.transform.Find("hull");
                         RectTransform target_rect = target.AddComponent<RectTransform>();
-                        target_rect.anchoredPosition = new Vector2(0f, 0f);                        
+                        target_rect.anchoredPosition = new Vector2(0f, 0f);
                         target_rect.localScale = new Vector3(0.6f, 1f, 1f);
                         Image target_img = target.AddComponent<Image>();
                         target_img.sprite = azimuthHUD.transform.Find("turret").GetComponent<Image>().sprite;
@@ -185,13 +181,27 @@ namespace PactAzimuthIndicatorMod
                 }
             }
 
-            if (gameManager.transform.Find("UIHUDCanvas/weapons text").gameObject.GetComponent<AzimuthText>() == null) {
+            if (gameManager.transform.Find("UIHUDCanvas/pact mils text") == null) {                
                 if (mils_readout.Value)
                 {
-                    AzimuthText azimuthText = gameManager.transform.Find("UIHUDCanvas/weapons text").gameObject.AddComponent<AzimuthText>();
-                    azimuthText._weaponText = gameManager.transform.Find("UIHUDCanvas/weapons text").GetComponent<Text>();
-                    azimuthText._weaponHUD = gameManager.transform.Find("UIHUDCanvas/weapons text").GetComponent<WeaponHud>();
+                    GameObject milsText_go = new GameObject("pact mils text");
+                    milsText_go.transform.parent = gameManager.transform.Find("UIHUDCanvas");                    
+                    RectTransform rectT = milsText_go.gameObject.AddComponent<RectTransform>();
+                    Text textBox = milsText_go.gameObject.AddComponent<Text>();
+                    AzimuthText azimuthText = milsText_go.gameObject.AddComponent<AzimuthText>();                    
+                    
+                    rectT.anchoredPosition = new Vector2(335f, 89f);
+                    rectT.anchorMax = new Vector2(0f, 0f);
+                    rectT.anchorMin = new Vector2(0f, 0f);
+                    rectT.sizeDelta = new Vector2(224.61f, 30f);
+                    rectT.localScale = new Vector3(1f, 1f, 1f);
+                    textBox.font = gameManager.transform.Find("UIHUDCanvas/drivetrain text").GetComponent<Text>().font;
+                    textBox.fontSize = 14;
+                    
+                    azimuthText._textBox = textBox;                    
                     azimuthText.playerInput = Object.FindObjectOfType<PlayerInput>();
+                    azimuthText.ownRect = rectT;
+                    azimuthText.anchor = gameManager.transform.Find("UIHUDCanvas/weapons text/azimuth HUD").GetComponent<RectTransform>();
                 }
             }
             
