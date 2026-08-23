@@ -28,6 +28,8 @@ namespace PactAzimuthIndicatorMod
         public AimablePlatform _aimablePlatform;
         public RectTransform ownRect;
         public RectTransform anchor;
+        public AarController aar;        
+        
         public void Update()
         {
             if (_textBox != null && _aimablePlatform != null)
@@ -46,11 +48,16 @@ namespace PactAzimuthIndicatorMod
 
         public void LateUpdate()
         {
+            if (aar._inAar) { 
+                this.gameObject.SetActive(false); 
+                return; 
+            }
             if (playerInput.CurrentPlayerChassis != null) _chassis = playerInput.CurrentPlayerChassis as NwhChassis;
             WeaponsManager wepMan = (playerInput.CurrentPlayerUnit != null) ? playerInput.CurrentPlayerUnit.WeaponsManager : null;
             if (wepMan != null) _aimablePlatform = wepMan.Weapons[0].FCS.Mounts[0];
             ownRect.position = new Vector3(anchor.position.x + anchor.rect.width, ownRect.position.y, ownRect.position.z);
         }       
+        
 
     }
 
@@ -213,6 +220,9 @@ namespace PactAzimuthIndicatorMod
                     }
                     tempArray[oldLength] = milsText_go;                    
                     excList.ExcludedItems = tempArray;
+
+                    AarController aarCon = gameManager.transform.Find("AAR").GetComponent<AarController>();
+                    azimuthText.aar = aarCon;
                 }
             }
             
@@ -220,3 +230,4 @@ namespace PactAzimuthIndicatorMod
         }
     }
 }
+
